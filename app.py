@@ -229,7 +229,7 @@ with col5:
         "English": df["English"].mean()
     }
 
-    fig1, ax1 = plt.subplots(figsize=(4,4))
+    fig1, ax1 = plt.subplots(figsize=(5,4))
 
     colors = ["red","blue","green"]
 
@@ -245,7 +245,9 @@ with col5:
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-# ATTENDANCE GRAPH
+# =====================================================
+# ATTENDANCE ANALYSIS
+# =====================================================
 
 with col6:
 
@@ -253,22 +255,46 @@ with col6:
 
     st.subheader("📈 Attendance Analysis")
 
-    fig2, ax2 = plt.subplots(figsize=(4,4))
+    fig2, ax2 = plt.subplots(figsize=(12,5))
 
     ax2.plot(
         df["Name"],
         df["Attendance"],
         marker='o',
-        color='cyan'
+        color='cyan',
+        linewidth=3,
+        markersize=10
     )
 
-    ax2.set_ylabel("Attendance %")
+    for i, value in enumerate(df["Attendance"]):
+        ax2.text(
+            i,
+            value + 1,
+            str(value),
+            ha='center',
+            color='white',
+            fontsize=10,
+            fontweight='bold'
+        )
+
+    ax2.set_ylabel("Attendance %", fontsize=12)
+    ax2.set_xlabel("Students", fontsize=12)
+
+    plt.xticks(rotation=45, fontsize=10)
+
+    ax2.grid(True, linestyle='--', alpha=0.5)
+
+    ax2.set_facecolor('#111827')
+
+    plt.tight_layout()
 
     st.pyplot(fig2)
 
     st.markdown("</div>", unsafe_allow_html=True)
 
+# =====================================================
 # TOPPER VS OTHERS
+# =====================================================
 
 with col7:
 
@@ -276,7 +302,7 @@ with col7:
 
     st.subheader("🏆 Topper vs Others")
 
-    fig3, ax3 = plt.subplots(figsize=(4,4))
+    fig3, ax3 = plt.subplots(figsize=(5,4))
 
     pie_colors = [
         "green",
@@ -364,9 +390,7 @@ if question:
         answer = f"🏆 {topper['Name']} is the topper with average marks {topper['Average']:.2f}"
 
     elif "average" in q or "avg" in q:
-
         avg_student = df["Average"].mean()
-
         answer = f"📊 Overall average student marks are {avg_student:.2f}"
 
     elif "attendance" in q:
@@ -376,25 +400,16 @@ if question:
         answer = f"⚠ {weak_student['Name']} needs improvement."
 
     elif "science topper" in q:
-
         science_topper = df.loc[df["Science"].idxmax()]
-
         answer = f"🧪 {science_topper['Name']} is Science topper."
 
     elif "math topper" in q:
-
         math_topper = df.loc[df["Math"].idxmax()]
-
         answer = f"📚 {math_topper['Name']} is Math topper."
 
     elif "english topper" in q:
-
         english_topper = df.loc[df["English"].idxmax()]
-
         answer = f"📖 {english_topper['Name']} is English topper."
-
-    elif "ai" in q:
-        answer = "🤖 AI analyzes student performance automatically."
 
     else:
         answer = "✅ AI processed your question successfully."
