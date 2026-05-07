@@ -80,11 +80,80 @@ unsafe_allow_html=True
 # =====================================================
 
 data = {
-    "Name":["Rahul","Shivam","Aman","Priya","Rohit"],
-    "Attendance":[90,75,60,95,55],
-    "Math":[88,76,45,95,40],
-    "Science":[85,70,50,98,35],
-    "English":[80,72,55,90,45]
+    "Name":[
+        "Rahul",
+        "Shivam",
+        "Aman",
+        "Priya",
+        "Rohit",
+        "Aditi",
+        "Karan",
+        "Neha",
+        "Arjun",
+        "Sneha",
+        "Vikas",
+        "Anjali"
+    ],
+
+    "Attendance":[
+        90,
+        75,
+        60,
+        95,
+        55,
+        88,
+        78,
+        92,
+        81,
+        85,
+        68,
+        94
+    ],
+
+    "Math":[
+        88,
+        76,
+        45,
+        95,
+        40,
+        91,
+        67,
+        85,
+        79,
+        83,
+        58,
+        96
+    ],
+
+    "Science":[
+        85,
+        70,
+        50,
+        98,
+        35,
+        89,
+        72,
+        90,
+        80,
+        82,
+        60,
+        97
+    ],
+
+    "English":[
+        80,
+        72,
+        55,
+        90,
+        45,
+        93,
+        70,
+        87,
+        76,
+        84,
+        62,
+        95
+    ]
 }
 
 df = pd.DataFrame(data)
@@ -105,117 +174,38 @@ poor_attendance = df[df["Attendance"] < 70]
 
 col1,col2,col3,col4 = st.columns(4)
 
-# TOTAL STUDENTS
 with col1:
     st.markdown(f"""
-    <div style="
-    background:#16a34a;
-    padding:25px;
-    border-radius:20px;
-    height:220px;
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-    ">
-
-    <div style="font-size:22px;">
-    👨‍🎓 Total Students
-    </div>
-
-    <div style="font-size:50px;font-weight:bold;">
+    <div class='output'>
+    👨‍🎓 Total Students<br><br>
     {len(df)}
     </div>
-
-    </div>
     """, unsafe_allow_html=True)
 
-# TOPPER
 with col2:
     st.markdown(f"""
-    <div style="
-    background:#16a34a;
-    padding:25px;
-    border-radius:20px;
-    height:220px;
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-    ">
-
-    <div style="font-size:22px;">
-    🏆 Topper
-    </div>
-
-    <div style="
-    color:lime;
-    font-size:50px;
-    font-weight:bold;
-    ">
+    <div class='output'>
+    🏆 Topper<br><br>
+    <span style='color:lime;font-size:40px;font-weight:bold'>
     {topper['Name']}
-    </div>
-
-    <div style="font-size:24px;">
+    </span><br>
     Avg Marks: {topper['Average']:.2f}
     </div>
-
-    </div>
     """, unsafe_allow_html=True)
 
-# WEAK STUDENT
 with col3:
     st.markdown(f"""
-    <div style="
-    background:#16a34a;
-    padding:25px;
-    border-radius:20px;
-    height:220px;
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-    ">
-
-    <div style="font-size:22px;">
-    ⚠ Weak Student
-    </div>
-
-    <div style="
-    font-size:45px;
-    font-weight:bold;
-    ">
+    <div class='output'>
+    ⚠ Weak Student<br><br>
     {weak_student['Name']}
-    </div>
-
     </div>
     """, unsafe_allow_html=True)
 
-# POOR ATTENDANCE
 with col4:
     st.markdown(f"""
-    <div style="
-    background:#16a34a;
-    padding:25px;
-    border-radius:20px;
-    height:220px;
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-    ">
-
-    <div style="font-size:22px;">
-    📉 Poor Attendance
-    </div>
-
-    <div style="
-    font-size:45px;
-    font-weight:bold;
-    ">
-    {len(poor_attendance)}
-    </div>
-
-    <div style="font-size:20px;">
-    Students
-    </div>
-
+    <div class='output'>
+    📉 Poor Attendance<br><br>
+    {len(poor_attendance)} Students
     </div>
     """, unsafe_allow_html=True)
 
@@ -226,6 +216,7 @@ with col4:
 col5,col6,col7 = st.columns(3)
 
 # SUBJECT WISE GRAPH
+
 with col5:
 
     st.markdown("<div class='card'>", unsafe_allow_html=True)
@@ -255,6 +246,7 @@ with col5:
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ATTENDANCE GRAPH
+
 with col6:
 
     st.markdown("<div class='card'>", unsafe_allow_html=True)
@@ -277,6 +269,7 @@ with col6:
     st.markdown("</div>", unsafe_allow_html=True)
 
 # TOPPER VS OTHERS
+
 with col7:
 
     st.markdown("<div class='card'>", unsafe_allow_html=True)
@@ -285,7 +278,20 @@ with col7:
 
     fig3, ax3 = plt.subplots(figsize=(4,4))
 
-    pie_colors = ["green","blue","orange","purple","red"]
+    pie_colors = [
+        "green",
+        "blue",
+        "orange",
+        "purple",
+        "red",
+        "yellow",
+        "pink",
+        "cyan",
+        "brown",
+        "gray",
+        "lime",
+        "magenta"
+    ]
 
     ax3.pie(
         df["Average"],
@@ -504,8 +510,6 @@ if feedback:
     Sentiment Score: {score:.2f}
     </div>
     """, unsafe_allow_html=True)
-
-# FEEDBACK CHART
 
 st.subheader("📊 Feedback Sentiment Chart")
 
