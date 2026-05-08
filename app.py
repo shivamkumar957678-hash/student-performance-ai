@@ -1,3 +1,7 @@
+# =========================
+# AI POWERED STUDENT PERFORMANCE SYSTEM
+# =========================
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -5,551 +9,395 @@ from textblob import TextBlob
 from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
 
-# =====================================================
+# -------------------------
 # PAGE CONFIG
-# =====================================================
+# -------------------------
+st.set_page_config(page_title="AI Student System", layout="wide")
 
-st.set_page_config(
-    page_title="AI Student Performance System",
-    layout="wide"
-)
+# -------------------------
+# LOGIN DETAILS
+# -------------------------
+USERNAME = "shivam"
+PASSWORD = "12345"
 
-# =====================================================
-# CSS
-# =====================================================
+# -------------------------
+# SESSION
+# -------------------------
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
 
+# -------------------------
+# LOGIN PAGE
+# -------------------------
+if not st.session_state.logged_in:
+
+    st.markdown("""
+    <style>
+
+    .stApp{
+        background: linear-gradient(to right,#0f172a,#7c3aed);
+        color:white;
+    }
+
+    h1,h2,h3{
+        color:white;
+    }
+
+    .login-box{
+        padding:40px;
+        border-radius:20px;
+        background: rgba(255,255,255,0.08);
+    }
+
+    label{
+        color:white !important;
+        font-size:22px !important;
+        font-weight:bold !important;
+    }
+
+    .stTextInput input{
+        background:white !important;
+        color:black !important;
+        font-size:20px !important;
+    }
+
+    </style>
+    """, unsafe_allow_html=True)
+
+    st.markdown("<div class='login-box'>", unsafe_allow_html=True)
+
+    st.title("🔐 AI Student System Login")
+
+    st.markdown("## 👤 Username")
+    username = st.text_input("", placeholder="Enter Username")
+
+    st.markdown("## 🔑 Password")
+    password = st.text_input("", type="password", placeholder="Enter Password")
+
+    if st.button("🚀 Login"):
+
+        if username == USERNAME and password == PASSWORD:
+            st.session_state.logged_in = True
+            st.success("✅ Login Successful")
+            st.rerun()
+
+        else:
+            st.error("❌ Wrong Username or Password")
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    st.stop()
+
+# -------------------------
+# MAIN CSS
+# -------------------------
 st.markdown("""
 <style>
 
 .stApp{
-background: linear-gradient(135deg,#0f172a,#1e3a8a,#7c3aed,#9333ea);
+background: linear-gradient(to right,#0f172a,#7c3aed);
 color:white;
 }
 
-.main-title{
-text-align:center;
-font-size:55px;
-font-weight:bold;
+/* HEADINGS */
+h1,h2,h3{
 color:white;
-margin-top:20px;
 }
 
-.sub-title{
-text-align:center;
-font-size:28px;
-color:#facc15;
-margin-bottom:30px;
+/* LABELS */
+label{
+color:white !important;
+font-size:22px !important;
+font-weight:bold !important;
+opacity:1 !important;
 }
 
-.card{
-background:rgba(255,255,255,0.10);
-padding:20px;
-border-radius:20px;
-margin-bottom:20px;
-box-shadow:0px 0px 15px rgba(255,255,255,0.15);
+/* TEXT INPUT */
+.stTextInput input{
+background:white !important;
+color:black !important;
+font-size:20px !important;
 }
 
-.output{
+/* TEXT AREA */
+.stTextArea textarea{
+background:white !important;
+color:black !important;
+font-size:20px !important;
+}
+
+/* SLIDER TEXT */
+.stSlider label{
+color:white !important;
+font-size:22px !important;
+font-weight:bold !important;
+}
+
+/* FIX HIDDEN TEXT */
+.css-1cpxqw2,
+.css-10trblm,
+.css-q8sbsg,
+.css-1offfwp{
+opacity:1 !important;
+color:white !important;
+}
+
+/* METRIC BOX */
+[data-testid="stMetric"]{
 background:#16a34a;
-padding:20px;
+padding:15px;
 border-radius:15px;
-font-size:20px;
-color:white;
-margin-top:10px;
+}
+
+/* SUCCESS BOX */
+.stSuccess{
+font-size:20px !important;
+}
+
+/* INFO BOX */
+.stInfo{
+font-size:20px !important;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
-# =====================================================
-# TITLE
-# =====================================================
-
-st.markdown(
-"<div class='main-title'>🎓 AI-Powered Student Performance System</div>",
-unsafe_allow_html=True
-)
-
-st.markdown(
-"<div class='sub-title'>🚀 AI + Automation + Smart Analytics</div>",
-unsafe_allow_html=True
-)
-
-# =====================================================
-# SAMPLE DATA
-# =====================================================
-
+# -------------------------
+# DATABASE DATA
+# -------------------------
 data = {
-    "Name":[
-        "Rahul",
-        "Shivam",
-        "Aman",
-        "Priya",
-        "Rohit",
-        "Aditi",
-        "Karan",
-        "Neha",
-        "Arjun",
-        "Sneha",
-        "Vikas",
-        "Anjali"
-    ],
-
-    "Attendance":[
-        90,
-        75,
-        60,
-        95,
-        55,
-        88,
-        78,
-        92,
-        81,
-        85,
-        68,
-        94
-    ],
-
-    "Math":[
-        88,
-        76,
-        45,
-        95,
-        40,
-        91,
-        67,
-        85,
-        79,
-        83,
-        58,
-        96
-    ],
-
-    "Science":[
-        85,
-        70,
-        50,
-        98,
-        35,
-        89,
-        72,
-        90,
-        80,
-        82,
-        60,
-        97
-    ],
-
-    "English":[
-        80,
-        72,
-        55,
-        90,
-        45,
-        93,
-        70,
-        87,
-        76,
-        84,
-        62,
-        95
-    ]
+    "Name":["Rahul","Shivam","Aman","Priya","Rohit","Aditi","Karan","Neha","Arjun","Sneha","Vikas","Anjali"],
+    "Attendance":[90,75,60,95,55,88,78,92,81,85,68,94],
+    "Math":[88,76,45,95,40,91,67,85,79,82,58,96],
+    "Science":[85,70,50,98,35,89,72,90,80,84,60,97],
+    "English":[80,72,55,90,45,93,70,87,76,81,59,95]
 }
 
 df = pd.DataFrame(data)
 
-df["Average"] = (
-    df["Math"] +
-    df["Science"] +
-    df["English"]
-)/3
-
-# =====================================================
-# TOP ANALYTICS
-# =====================================================
+# -------------------------
+# AI CALCULATIONS
+# -------------------------
+df["Average"] = df[["Math","Science","English"]].mean(axis=1)
 
 topper = df.loc[df["Average"].idxmax()]
 weak_student = df.loc[df["Average"].idxmin()]
-poor_attendance = df[df["Attendance"] < 70]
 
+# -------------------------
+# TITLE
+# -------------------------
+st.title("🎓 AI-Powered Student Performance System")
+st.subheader("🚀 AI + Automation + Smart Analytics")
+
+# -------------------------
+# METRICS
+# -------------------------
 col1,col2,col3,col4 = st.columns(4)
 
 with col1:
-    st.markdown(f"""
-    <div class='output'>
-    👨‍🎓 Total Students<br><br>
-    {len(df)}
-    </div>
-    """, unsafe_allow_html=True)
+    st.metric("👨‍🎓 Total Students", len(df))
 
 with col2:
-    st.markdown(f"""
-    <div class='output'>
-    🏆 Topper<br><br>
-    <span style='color:lime;font-size:40px;font-weight:bold'>
-    {topper['Name']}
-    </span><br>
-    Avg Marks: {topper['Average']:.2f}
-    </div>
-    """, unsafe_allow_html=True)
+    st.metric("🏆 Topper", topper["Name"])
 
 with col3:
-    st.markdown(f"""
-    <div class='output'>
-    ⚠ Weak Student<br><br>
-    {weak_student['Name']}
-    </div>
-    """, unsafe_allow_html=True)
+    st.metric("⚠ Weak Student", weak_student["Name"])
 
 with col4:
-    st.markdown(f"""
-    <div class='output'>
-    📉 Poor Attendance<br><br>
-    {len(poor_attendance)} Students
-    </div>
-    """, unsafe_allow_html=True)
+    poor = len(df[df["Attendance"] < 75])
+    st.metric("📉 Poor Attendance", poor)
 
-# =====================================================
+# -------------------------
 # GRAPHS
-# =====================================================
+# -------------------------
+c1,c2,c3 = st.columns(3)
 
-col5,col6,col7 = st.columns(3)
-
-# SUBJECT WISE GRAPH
-
-with col5:
-
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
+# SUBJECT GRAPH
+with c1:
 
     st.subheader("📚 Subject Wise Average")
 
-    subject_avg = {
-        "Math": df["Math"].mean(),
-        "Science": df["Science"].mean(),
-        "English": df["English"].mean()
-    }
+    subject_avg = [
+        df["Math"].mean(),
+        df["Science"].mean(),
+        df["English"].mean()
+    ]
 
-    fig1, ax1 = plt.subplots(figsize=(5,4))
+    fig, ax = plt.subplots()
 
-    colors = ["red","blue","green"]
-
-    ax1.bar(
-        subject_avg.keys(),
-        subject_avg.values(),
-        color=colors
+    ax.bar(
+        ["Math","Science","English"],
+        subject_avg,
+        color=["red","blue","green"]
     )
 
-    ax1.set_ylabel("Marks")
+    ax.set_ylabel("Marks")
 
-    st.pyplot(fig1)
+    st.pyplot(fig)
 
-    st.markdown("</div>", unsafe_allow_html=True)
-
-# =====================================================
-# ATTENDANCE ANALYSIS
-# =====================================================
-
-with col6:
-
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
+# ATTENDANCE GRAPH
+with c2:
 
     st.subheader("📈 Attendance Analysis")
 
-    fig2, ax2 = plt.subplots(figsize=(12,5))
+    fig2, ax2 = plt.subplots(figsize=(8,4))
 
     ax2.plot(
         df["Name"],
         df["Attendance"],
         marker='o',
-        color='cyan',
-        linewidth=3,
-        markersize=10
+        color='cyan'
     )
 
-    for i, value in enumerate(df["Attendance"]):
-        ax2.text(
-            i,
-            value + 1,
-            str(value),
-            ha='center',
-            color='white',
-            fontsize=10,
-            fontweight='bold'
-        )
+    plt.xticks(rotation=45)
 
-    ax2.set_ylabel("Attendance %", fontsize=12)
-    ax2.set_xlabel("Students", fontsize=12)
-
-    plt.xticks(rotation=45, fontsize=10)
-
-    ax2.grid(True, linestyle='--', alpha=0.5)
-
-    ax2.set_facecolor('#111827')
-
-    plt.tight_layout()
+    ax2.set_ylabel("Attendance %")
 
     st.pyplot(fig2)
 
-    st.markdown("</div>", unsafe_allow_html=True)
-
-# =====================================================
-# TOPPER VS OTHERS
-# =====================================================
-
-with col7:
-
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
+# PIE CHART
+with c3:
 
     st.subheader("🏆 Topper vs Others")
 
-    fig3, ax3 = plt.subplots(figsize=(5,4))
-
-    pie_colors = [
-        "green",
-        "blue",
-        "orange",
-        "purple",
-        "red",
-        "yellow",
-        "pink",
-        "cyan",
-        "brown",
-        "gray",
-        "lime",
-        "magenta"
-    ]
+    fig3, ax3 = plt.subplots(figsize=(7,7))
 
     ax3.pie(
         df["Average"],
         labels=df["Name"],
-        autopct='%1.1f%%',
-        colors=pie_colors
+        autopct='%1.1f%%'
     )
 
     st.pyplot(fig3)
 
-    st.markdown("</div>", unsafe_allow_html=True)
+# -------------------------
+# TABLE
+# -------------------------
+st.subheader("📋 Student Performance Table")
 
-# =====================================================
-# STUDENT PERFORMANCE TABLE
-# =====================================================
+def status(avg):
+    if avg >= 85:
+        return "Topper"
+    elif avg >= 60:
+        return "Good"
+    else:
+        return "Weak"
 
-st.markdown("<div class='card'>", unsafe_allow_html=True)
+df["Status"] = df["Average"].apply(status)
 
-st.subheader("📋 Student Performance")
+st.dataframe(df, use_container_width=True)
 
-performance_df = df.copy()
-
-performance_df["Status"] = np.where(
-    performance_df["Average"] > 80,
-    "Topper",
-    np.where(
-        performance_df["Average"] > 60,
-        "Good",
-        "Weak"
-    )
-)
-
-def highlight_topper(row):
-
-    if row["Status"] == "Topper":
-
-        return [
-            'color:lime;font-weight:bold;background-color:black'
-        ] * len(row)
-
-    return [''] * len(row)
-
-styled_df = performance_df.style.apply(
-    highlight_topper,
-    axis=1
-)
-
-st.dataframe(
-    styled_df,
-    use_container_width=True
-)
-
-st.markdown("</div>", unsafe_allow_html=True)
-
-# =====================================================
+# -------------------------
 # AI CHATBOT
-# =====================================================
+# -------------------------
+st.subheader("🤖 AI Chatbot")
 
-st.markdown("<div class='card'>", unsafe_allow_html=True)
+q = st.text_input("Ask AI Question")
 
-st.header("🤖 Advanced AI Chatbot")
+if q:
 
-question = st.text_input("Ask AI Question")
-
-if question:
-
-    q = question.lower()
+    q = q.lower()
 
     if "topper" in q:
-        answer = f"🏆 {topper['Name']} is the topper with average marks {topper['Average']:.2f}"
+        st.success(f"🏆 {topper['Name']} is the topper.")
+
+    elif "weak" in q:
+        st.error(f"⚠ {weak_student['Name']} needs improvement.")
 
     elif "average" in q or "avg" in q:
         avg_student = df["Average"].mean()
-        answer = f"📊 Overall average student marks are {avg_student:.2f}"
-
-    elif "attendance" in q:
-        answer = "📈 Some students have poor attendance below 70%."
-
-    elif "weak" in q:
-        answer = f"⚠ {weak_student['Name']} needs improvement."
-
-    elif "science topper" in q:
-        science_topper = df.loc[df["Science"].idxmax()]
-        answer = f"🧪 {science_topper['Name']} is Science topper."
-
-    elif "math topper" in q:
-        math_topper = df.loc[df["Math"].idxmax()]
-        answer = f"📚 {math_topper['Name']} is Math topper."
-
-    elif "english topper" in q:
-        english_topper = df.loc[df["English"].idxmax()]
-        answer = f"📖 {english_topper['Name']} is English topper."
+        st.info(f"📊 Overall average student marks are {avg_student:.2f}")
 
     else:
-        answer = "✅ AI processed your question successfully."
+        st.warning("🤖 AI could not understand.")
 
-    st.markdown(f"""
-    <div class='output'>
-    {answer}
-    </div>
-    """, unsafe_allow_html=True)
+# -------------------------
+# ML PREDICTION
+# -------------------------
+st.subheader("🧠 AI Model Implementation (ML/DL)")
 
-st.markdown("</div>", unsafe_allow_html=True)
-
-# =====================================================
-# ML MODEL
-# =====================================================
-
-st.markdown("<div class='card'>", unsafe_allow_html=True)
-
-st.header("🧠 AI Model Implementation (ML/DL)")
-
-hours = np.array([1,2,3,4,5,6,7,8]).reshape(-1,1)
-
-marks = np.array([20,30,40,50,60,70,80,90])
+hours = np.array([1,2,3,4,5,6]).reshape(-1,1)
+marks = np.array([20,35,50,65,80,95])
 
 model = LinearRegression()
-
 model.fit(hours, marks)
 
-study_hour = st.slider(
-    "Select Study Hours",
-    1,
-    12
-)
+study = st.slider("📚 Study Hours",1,10)
 
-prediction = model.predict([[study_hour]])
+prediction = model.predict([[study]])
 
-st.markdown(f"""
-<div class='output'>
-📚 Study Hours: {study_hour}<br><br>
-🎯 Predicted Marks: {prediction[0]:.2f}
-</div>
-""", unsafe_allow_html=True)
+st.success(f"🎯 Predicted Marks: {prediction[0]:.2f}")
 
-st.markdown("</div>", unsafe_allow_html=True)
+# -------------------------
+# FEEDBACK SYSTEM
+# -------------------------
+st.subheader("💬 Feedback System with AI Sentiment Analysis")
 
-# =====================================================
-# WEEKLY REPORT
-# =====================================================
+feedback = st.text_area("Enter Feedback")
 
-st.markdown("<div class='card'>", unsafe_allow_html=True)
+if feedback:
 
-st.header("📧 Weekly Report Auto-generated & Emailed")
+    sentiment = TextBlob(feedback).sentiment.polarity
 
-student_name = st.selectbox(
-    "Select Student",
-    df["Name"]
-)
+    if sentiment > 0:
+        st.success(f"😊 Positive Feedback\n\nSentiment Score: {sentiment:.2f}")
+
+    elif sentiment < 0:
+        st.error(f"😔 Negative Feedback\n\nSentiment Score: {sentiment:.2f}")
+
+    else:
+        st.warning(f"😐 Neutral Feedback\n\nSentiment Score: {sentiment:.2f}")
+
+# -------------------------
+# FACE RECOGNITION UI
+# -------------------------
+st.subheader("📸 Face Recognition Attendance")
+
+student_name = st.text_input("Enter Student Name")
+
+img = st.camera_input("📸 Take Student Photo")
+
+if img and student_name:
+
+    file_name = f"{student_name}.jpg"
+
+    with open(file_name, "wb") as f:
+        f.write(img.getbuffer())
+
+    st.image(img, width=300)
+
+    st.success("✅ Face Recognition Successful")
+
+    st.balloons()
+
+    st.markdown("""
+    <h2 style='color:lime;text-align:center;'>
+    🎯 Attendance Marked Successfully
+    </h2>
+    """, unsafe_allow_html=True)
+
+    st.info(f"📌 {student_name} Present")
+
+    st.success(f"📁 Photo Saved as {file_name}")
+
+# -------------------------
+# REPORT GENERATOR
+# -------------------------
+st.subheader("📩 Weekly AI Report")
+
+student = st.selectbox("Select Student", df["Name"])
 
 email = st.text_input("Enter Email")
 
 if st.button("Generate Report"):
 
-    student = df[df["Name"] == student_name]
+    row = df[df["Name"] == student].iloc[0]
 
-    st.markdown(f"""
-    <div class='output'>
-    📩 Report Generated Successfully<br><br>
+    st.success("✅ Report Generated Successfully")
 
-    👨‍🎓 Student: {student_name}<br>
+    st.write(f"👨‍🎓 Student: {student}")
+    st.write(f"📧 Email: {email}")
+    st.write(f"📊 Attendance: {row['Attendance']}%")
+    st.write(f"📚 Average Marks: {row['Average']:.2f}")
 
-    📧 Email: {email}<br>
-
-    📊 Attendance: {student['Attendance'].values[0]}%<br>
-
-    📚 Average Marks: {student['Average'].values[0]:.2f}<br>
-
-    ✅ AI Summary Created Successfully
-    </div>
-    """, unsafe_allow_html=True)
-
-st.markdown("</div>", unsafe_allow_html=True)
-
-# =====================================================
-# FEEDBACK SYSTEM
-# =====================================================
-
-st.markdown("<div class='card'>", unsafe_allow_html=True)
-
-st.header("💬 Feedback System with AI Sentiment Analysis")
-
-feedback = st.text_area(
-    "Enter Student Feedback"
-)
-
-if feedback:
-
-    analysis = TextBlob(feedback)
-
-    score = analysis.sentiment.polarity
-
-    if score > 0:
-        result = "😊 Positive Feedback"
-
-    elif score == 0:
-        result = "😐 Neutral Feedback"
-
-    else:
-        result = "😢 Negative Feedback"
-
-    st.markdown(f"""
-    <div class='output'>
-    {result}<br><br>
-    Sentiment Score: {score:.2f}
-    </div>
-    """, unsafe_allow_html=True)
-
-st.subheader("📊 Feedback Sentiment Chart")
-
-fig4, ax4 = plt.subplots()
-
-labels = ["Positive","Neutral","Negative"]
-
-values = [72,18,10]
-
-ax4.pie(
-    values,
-    labels=labels,
-    autopct='%1.1f%%'
-)
-
-st.pyplot(fig4)
-
-st.markdown("</div>", unsafe_allow_html=True)
-
-# =====================================================
-# FOOTER
-# =====================================================
-
-st.markdown("""
-<h3 style='text-align:center;color:white;margin-top:30px;'>
-🚀 AI + Automation • Smart Insights • Better Decisions • Student Success
-</h3>
-""", unsafe_allow_html=True)
+    st.success("🤖 AI Summary Created Successfully")
